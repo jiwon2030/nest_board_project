@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { Board } from 'src/model/boards.model';
 import { v1 as uuid_v1 } from 'uuid';
 import { CommentRepository } from 'src/comments/comments.repository';
-import { BoardFindBasicResDto, createBoardDto } from './dto/board.dto';
+import { BoardFindBasicResDto, CreateBoardDto } from './dto/board.dto';
 
 
 @Injectable()
@@ -22,7 +22,7 @@ export class BoardRepository {
     }
 
     // 게시판 글 등록
-    async createBoard(createBoardDto: createBoardDto, user: User): Promise<Board> {
+    async createBoard(data: CreateBoardDto) {
         
         const uid = uuid_v1();
         const title = data.title;
@@ -31,24 +31,24 @@ export class BoardRepository {
         const createdAt = new Date;
         const updatedAt = new Date;
        
-        const board: createBoardDto = { uid, title, content, comments, createdAt, updatedAt };
+        const board: CreateBoardDto = { uid, title, content, comments, createdAt, updatedAt };
         
         return await this.boardModel.create(board);
     }
 
     // 게시판 글 상세 페이지
     async getBoardById(_id: string) { 
-        return await this.boardModel.findOne({ uid: _id });
+        const board = await this.boardModel.findOne({ uid: _id });
+        return board;
     }
 
     // 게시판 글 수정
     async updateBoard(id: string) {
         const board = await this.getBoardById(id);
 
-        const { _id, content } = board
+        const { _id, title, content, updatedAt } = board
 
-        board.content = content;
-        await this.boardModel.updateOne({ _id }, { content });
+        await this.boardModel.updateOne({ _id }, { title, content, updatedAt });
         board.save();
 
         return board;

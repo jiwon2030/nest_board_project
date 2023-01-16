@@ -37,4 +37,11 @@ export class AuthRepository {
       return false;
     }
   }
+
+  async loginCheck(_id: string) {
+    const user = await this.userModel.findOne({ _id }).select({
+      
+    });
+    return;
+  }
 }

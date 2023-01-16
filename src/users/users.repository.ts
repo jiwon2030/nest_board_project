@@ -13,7 +13,7 @@ export class UsersRepository {
   ) {}
 
   // id 중복여부 확인
-  async userIdCheck(id: string) {
+  async findUseId(id: string) {
     const user = await this.userModel.findOne({ id }).select({ _id: 1, id: 1 });
     if (user) {
       return true;
@@ -55,9 +55,9 @@ export class UsersRepository {
     const { id } = user;
     const user_info = await this.userModel
         .findOne({ id })
-        .select({ _id: 1, nickname: 1 });
-    const { _id, nickname } = user_info;
-    return { _id, nickname };
+        .select({ _id: 1, nickname: 1, password: 1 });
+    const { _id, nickname, password } = user_info;
+    return { _id, nickname, password };
   }
 
   // 닉네임 변경

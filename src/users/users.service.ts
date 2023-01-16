@@ -11,11 +11,11 @@ export class UsersService {
   // id 중복여부 확인
   async findNotUseId(param: SignupIdCheckDTO) {
     const { id } = param;
-    const check = await this.usersRepository.userIdCheck(id);
+    const check = await this.usersRepository.findUseId(id);
     if (check) {
       throw new ConflictException();
     } else {
-      return '';
+      return false;
     }
   }
 
@@ -26,14 +26,14 @@ export class UsersService {
     if (check) {
       throw new ConflictException();
     } else {
-      return '';
+      return false;
     }
   }
   
   // 회원가입
   async signUp(body: SignUpDTO) {
     const { id, nickname, password } = body;
-    const idCheck = await this.usersRepository.userIdCheck(id);
+    const idCheck = await this.usersRepository.findUseId(id);
     const nickNameCheck = await this.usersRepository.findUseNickName(nickname);
     if (!idCheck && !nickNameCheck) {
       await this.usersRepository.signUp({
@@ -41,7 +41,7 @@ export class UsersService {
         nickname,
         password,
       });
-      return '';
+      return '회원가입 완료';
     }
     else {
       throw new ConflictException();
@@ -56,16 +56,15 @@ export class UsersService {
   // 닉네임 변경
   async nicknameChange(body: UserNicknameChangeDTO) {
     const { id, nickname } = body;
-    const idCheck = await this.usersRepository.userIdCheck(id);
+    const idCheck = await this.usersRepository.findUseId(id);
     const nickNameCheck = await this.usersRepository.findUseNickName(nickname);
-    const changeNickName = nickname
-    ;
+    const changeNickName = nickname;
     if (idCheck && !nickNameCheck) {
       await this.usersRepository.nicknameChange({
         id,
         nickname: changeNickName,
       });
-      return '';
+      return '닉네임 변경 완료';
     }
     else { throw new NotFoundException(); }
   }
@@ -73,7 +72,7 @@ export class UsersService {
   // 비밀번호 변경
   async passwordChange(body: UserPwdChangeDTO) {
     const { id, pwd } = body;
-    const idCheck = await this.usersRepository.userIdCheck(id);
+    const idCheck = await this.usersRepository.findUseId(id);
     const makePassword = PasswordMaker(pwd);
     if (idCheck) {
       await this.usersRepository.passwordChange({
@@ -81,7 +80,7 @@ export class UsersService {
         password: makePassword.password,
         salt: makePassword.salt,
       });
-      return '';
+      return '비밀번호 변경 완료';
     } 
     else { throw new NotFoundException(); }
   }

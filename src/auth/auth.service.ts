@@ -3,20 +3,16 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/auth.dto';
 import { AuthRepository } from './auth.repository';
 import { PasswordDecoding } from 'src/utils/password';
-import { User } from '../model/users.model';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { UsersService } from 'src/users/users.service';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private userService: UsersService,
     private readonly authRepository: AuthRepository,
   ) {}
 
-  async Login(body: LoginDto) {
+  async Login(response: Response, body: LoginDto) {
     const { id, password } = body;
     const user = await this.authRepository.login(id);
     if (user) {
@@ -26,14 +22,15 @@ export class AuthService {
         userPassword: user.password,
       });
       if (checkPwd) {
-        const token = await this.jwtService.sign({
+        const token = this.jwtService.sign({
           _id: user._id,
           nickname: user.nickname,
         });
+        response.cookie('user', token);
         return { token };
       }
     } else {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('user does not exist');
     }
   }
   
