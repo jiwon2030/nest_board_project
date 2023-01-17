@@ -6,6 +6,8 @@ import {
     IsArray,
     IsDate,
     IsBoolean,
+    Length,
+    Matches,
 } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateBoardDto } from 'src/boards/dto/board.dto';
@@ -19,6 +21,7 @@ const options: SchemaOptions = {
 export class User extends Document {
     @IsNotEmpty()
     @IsString()
+    @Length(6-12)
     @Prop({
         required: true,
         unique: true,
@@ -32,6 +35,13 @@ export class User extends Document {
 
     @IsNotEmpty()
     @IsString()
+    @Length(8-16)
+    @Matches(
+        /^(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]){8,16}$/,
+        {
+          message: '비밀번호 양식에 맞게 작성하세요.',
+        },
+      )
     @Prop({
         required: true,
     })
@@ -66,21 +76,6 @@ export class User extends Document {
         required: true,
     })
     salt: string;
-    
-    @IsNotEmpty()
-    @IsString()
-    @Prop({
-        required: true,
-    })
-    token: string;
-
-    
-    @IsNotEmpty()
-    @IsBoolean()
-    @Prop({
-        required: true,
-    })
-    isAuth: boolean;
 
     @IsNotEmpty()
     @IsDate()

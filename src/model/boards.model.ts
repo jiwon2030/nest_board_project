@@ -33,7 +33,18 @@ export class Board extends Document {
     @IsString()
     @Prop({
         required: true,
-        unique: true,
+    })
+    @ApiProperty({
+        example: 'testuserID',
+        description: 'userID',
+        required: true,
+    })
+    userID: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @Prop({
+        required: true,
     })
     @ApiProperty({
         example: 'testtitle',
@@ -46,7 +57,6 @@ export class Board extends Document {
     @IsString()
     @Prop({
         required: true,
-        unique: true,
     })
     @ApiProperty({
         example: 'testcontent',

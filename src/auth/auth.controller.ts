@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Res, Req } from '@nestjs/common';
+import { Controller, UseGuards, Post, Body, Req, Res } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/auth.dto';
 import { Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -25,12 +26,13 @@ export class AuthController {
   })
   @Post()
   async login(
-    @Res({ passthrough: true }) response: Response, 
+    @Res({ passthrough: true }) res: Response, 
     @Body() body: LoginDto) {
     console.log("요청")
-    return this.authService.Login(response, body);
+    return this.authService.Login(res, body);
   }
 
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: '로그아웃' })
   @ApiTags('logout')
   @ApiResponse({
@@ -42,13 +44,10 @@ export class AuthController {
     description: '없는 계정'
   })
   @Post()
-  async logout(@Res() res: Response) {
-    res.cookie('jwt', '', {
-      maxAge: 0
-  })
-  return res.send({
-      message: 'success'
-  })
+  async logout(@Req() req: Request, @Res() res: Response) {
+    req.logout();
+    res.clearCookie('connect.sid', { httpOnly: true });
+    return res.send({ message: 'success' });
   }
 
 }

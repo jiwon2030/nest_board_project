@@ -3,6 +3,7 @@ import { User } from '../model/users.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common/exceptions';
 
 @Injectable()
 export class AuthRepository {
@@ -34,14 +35,8 @@ export class AuthRepository {
     if (user) {
       return user;
     } else {
-      return false;
+      throw new NotFoundException();
     }
   }
 
-  async loginCheck(_id: string) {
-    const user = await this.userModel.findOne({ _id }).select({
-      
-    });
-    return;
-  }
 }

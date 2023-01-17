@@ -9,6 +9,7 @@ export class BoardFindBasicResDto extends PickType(User, [
 
 export class CreateBoardDto {
     uid: string; // 랜덤 부여
+    userID: string; // 작성자 id
     title: string; // 제목
     content: string; // 내용
     comments: Array<BoardCommentDto>; // 댓글
@@ -16,9 +17,12 @@ export class CreateBoardDto {
     updatedAt: Date; // 수정 날짜
 }
 
+export class UpdateBoardDto {
+    readonly title: string;
+    readonly content: string;
+}
+
 export class BoardCommentDto {
     uid: string;
     content: string;
 }
-
-export class deleteBoardDto extends PickType(Board, ['uid'] as const) { }

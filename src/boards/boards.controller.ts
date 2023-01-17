@@ -1,7 +1,7 @@
-import { Controller, UseGuards, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { BoardsService } from './boards.service';
 import { Board } from 'src/model/boards.model'
-import { BoardFindBasicResDto, CreateBoardDto, BoardCommentDto, deleteBoardDto } from './dto/board.dto';
+import { CreateBoardDto, UpdateBoardDto } from './dto/board.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -20,33 +20,34 @@ export class BoardsController {
   @ApiOperation({ summary: '게시판 글 등록'})
   @ApiTags('board')
   @Post()
-  async createBoard(@Body() board: CreateBoardDto) {
-      return this.boardsService.createBoard(board);
+  async createBoard(@Req() req, @Body() board: CreateBoardDto) {
+      return this.boardsService.createBoard(req.user, board);
   }
 
   @ApiOperation({ summary: '게시판 글 상세 페이지'})
   @ApiTags('board')
-  @Get('/:id')
-  async getBoardById(@Param('id') id: string) {
-    return this.boardsService.getBoardById(id); 
+  @Get(':id')
+  async getBoardById(@Param('id') _id: string) {
+    return this.boardsService.getBoardById(_id); 
   }
 
   @UseGuards(AuthGuard())
   @ApiOperation({ summary: '게시판 글 수정'})
   @ApiTags('board')
-  @Patch('/:id/contents')
+  @Patch(':id')
   async updateBoard(
-    @Param('id') id: string,
-    @Body('contents') contents: string
+    @Param('uid') uid: string,
+    @Req() req,
+    @Body() updateBoardDto: UpdateBoardDto
   ) {
-    return this.boardsService.updateBoard(id, contents);
+    return this.boardsService.updateBoard(uid, req.user, updateBoardDto);
   }
   
   @UseGuards(AuthGuard())
   @ApiOperation({ summary: '게시판 글 삭제'})
   @ApiTags('board')
-  @Delete('/:id')
-  async deleteBoard(@Param('id') id: string) {
-    this.boardsService.deleteBoard(id);
+  @Delete(':id')
+  async deleteBoard(@Param('uid') uid: string, @Req() req) {
+    this.boardsService.deleteBoard(uid, req.user);
   }
 }

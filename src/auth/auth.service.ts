@@ -12,7 +12,7 @@ export class AuthService {
     private readonly authRepository: AuthRepository,
   ) {}
 
-  async Login(response: Response, body: LoginDto) {
+  async Login(res: Response, body: LoginDto) {
     const { id, password } = body;
     const user = await this.authRepository.login(id);
     if (user) {
@@ -26,12 +26,12 @@ export class AuthService {
           _id: user._id,
           nickname: user.nickname,
         });
-        response.cookie('user', token);
+        res.cookie('user', token);
         return { token };
       }
     } else {
       throw new UnauthorizedException('user does not exist');
     }
   }
-  
+
 }
