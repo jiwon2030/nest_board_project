@@ -3,6 +3,7 @@ import { UsersService } from './users.service';
 import { SignUpDTO, SignupIdCheckDTO, SignupNickNameCheckDTO, UserPwdChangeDTO } from './dto/users.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard  } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 
 @Controller('users')
 export class UsersController {
@@ -50,7 +51,7 @@ export class UsersController {
     summary: '회원가입',
   })
   @ApiTags('signup')
-  @Post()
+  @Post('signup')
   @ApiResponse({
     status: 200,
     description: '성공',
@@ -68,7 +69,7 @@ export class UsersController {
   }
 
   @ApiTags('user')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '유저정보 조회'})
   @ApiResponse({
     status: 200,
@@ -88,7 +89,7 @@ export class UsersController {
   }
 
   @ApiTags('user')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '비밀번호 변경' })
   @ApiResponse({
     status: 200,

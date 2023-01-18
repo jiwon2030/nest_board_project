@@ -13,7 +13,7 @@ export class UsersService {
     const { id } = param;
     const check = await this.usersRepository.findUseId(id);
     if (check) {
-      throw new ConflictException();
+      throw new ConflictException('존재하는 id');
     } else {
       return false;
     }
@@ -24,7 +24,7 @@ export class UsersService {
     const { nickname } = param;
     const check = await this.usersRepository.findUseNickName(nickname);
     if (check) {
-      throw new ConflictException();
+      throw new ConflictException('존재하는 닉네임');
     } else {
       return false;
     }
@@ -44,7 +44,7 @@ export class UsersService {
       return '회원가입 완료';
     }
     else {
-      throw new ConflictException();
+      throw new ConflictException('존재하는 계정');
     }
   }
 

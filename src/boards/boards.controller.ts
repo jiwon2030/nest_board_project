@@ -1,9 +1,9 @@
 import { Controller, UseGuards, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { BoardsService } from './boards.service';
-import { Board } from 'src/model/boards.model'
 import { CreateBoardDto, UpdateBoardDto } from './dto/board.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 
 @Controller('boards')
 export class BoardsController {
@@ -16,7 +16,7 @@ export class BoardsController {
     return this.boardsService.getAllBoards();
   }
 
-  @UseGuards(AuthGuard())
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시판 글 등록'})
   @ApiTags('board')
   @Post()
@@ -27,11 +27,11 @@ export class BoardsController {
   @ApiOperation({ summary: '게시판 글 상세 페이지'})
   @ApiTags('board')
   @Get(':id')
-  async getBoardById(@Param('id') _id: string) {
-    return this.boardsService.getBoardById(_id); 
+  async getBoardById(@Param('id') uid: CreateBoardDto) {
+    return this.boardsService.getBoardById(uid); 
   }
 
-  @UseGuards(AuthGuard())
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시판 글 수정'})
   @ApiTags('board')
   @Patch(':id')
@@ -43,7 +43,7 @@ export class BoardsController {
     return this.boardsService.updateBoard(uid, req.user, updateBoardDto);
   }
   
-  @UseGuards(AuthGuard())
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시판 글 삭제'})
   @ApiTags('board')
   @Delete(':id')

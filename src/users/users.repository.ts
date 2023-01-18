@@ -56,8 +56,7 @@ export class UsersRepository {
     const user_info = await this.userModel
         .findOne({ id })
         .select({ _id: 1, nickname: 1, password: 1 });
-    const { _id, nickname, password } = user_info;
-    return { _id, nickname, password };
+    return user_info;
   }
 
   // 닉네임 변경

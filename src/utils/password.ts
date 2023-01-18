@@ -5,7 +5,7 @@ export const PasswordMaker = (
   pwd: string,
 ): { password: string; salt: string } => {
   const salt: string = Math.round(new Date().valueOf() + Math.random()) + '';
-  const password: string = createHmac('sha512', process.env.CRYPTO)
+  const password: string = createHmac('sha512', "SADLFKJAHWERJH2Hsljdkhfnkjsdnfjnwejkrnkjlnfkjsdnflksdnfahrewthwonjdfngkjd")
     .update(pwd + salt)
     .digest('hex');
   return { password, salt };
@@ -17,7 +17,7 @@ export const PasswordDecoding = (pwd: {
   userPassword: string;
 }) => {
   const { password, salt, userPassword } = pwd;
-  const check: string = createHmac('sha512', process.env.CRYPTO)
+  const check: string = createHmac('sha512', "SADLFKJAHWERJH2Hsljdkhfnkjsdnfjnwejkrnkjlnfkjsdnflksdnfahrewthwonjdfngkjd")
     .update(password + salt)
     .digest('hex');
   if (check === userPassword) {

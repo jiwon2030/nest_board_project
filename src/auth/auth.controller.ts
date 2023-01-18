@@ -32,23 +32,23 @@ export class AuthController {
     return this.authService.Login(res, body);
   }
 
-  @UseGuards(AuthGuard())
-  @ApiOperation({ summary: '로그아웃' })
-  @ApiTags('logout')
-  @ApiResponse({
-    status: 200,
-    description: '성공'
-  })
-  @ApiResponse({
-    status: 404,
-    description: '없는 계정'
-  })
-  @Post()
-  async logout(@Req() req: Request, @Res() res: Response) {
-    req.logout();
-    res.clearCookie('connect.sid', { httpOnly: true });
-    return res.send({ message: 'success' });
-  }
+  //@UseGuards(AuthGuard())
+  //@ApiOperation({ summary: '로그아웃' })
+  //@ApiTags('logout')
+  //@ApiResponse({
+  //  status: 200,
+  //  description: '성공'
+  //})
+  //@ApiResponse({
+  //  status: 404,
+  //  description: '없는 계정'
+  //})
+  //@Post()
+  //async logout(@Req() req: Request, @Res() res: Response) {
+  //  req.logout();
+  //  res.clearCookie('connect.sid', { httpOnly: true });
+  //  return res.send({ message: 'success' });
+  //}
 
 }
 

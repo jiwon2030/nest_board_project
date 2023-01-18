@@ -1,28 +1,19 @@
-import { PickType, ApiProperty } from '@nestjs/swagger';
+import { PickType } from '@nestjs/swagger';
 import { User } from '../../model/users.model'
 import { Board } from '../../model/boards.model'
 
-export class BoardFindBasicResDto extends PickType(User, [
-    '_id',
+export class BoardFindBasicDto extends PickType(User, [
+    'id',
     'nickname',
 ] as const) { }
 
 export class CreateBoardDto {
     uid: string; // 랜덤 부여
-    userID: string; // 작성자 id
+    userID: string; // 게시글 작성자 id
     title: string; // 제목
     content: string; // 내용
-    comments: Array<BoardCommentDto>; // 댓글
     createdAt: Date; // 작성 날짜
     updatedAt: Date; // 수정 날짜
 }
 
-export class UpdateBoardDto {
-    readonly title: string;
-    readonly content: string;
-}
-
-export class BoardCommentDto {
-    uid: string;
-    content: string;
-}
+export class UpdateBoardDto extends PickType(Board, ['title', 'content', 'updatedAt'] as const) { }

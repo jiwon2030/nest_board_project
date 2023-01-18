@@ -12,7 +12,7 @@ import { AuthRepository } from './auth.repository';
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt', session: false }),
     JwtModule.register({
-      secret: process.env.JWTSECRET,
+      secret: "1290473%$Y&YLDSGFSDFKssahuiwh4eiufhej342dfs@DASDFSDqeijsfdAFHKDFJHKGJASfsfdgsfdrdfgsfjsrtyutysgfd",
       signOptions: { expiresIn: '1h' },
     }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
