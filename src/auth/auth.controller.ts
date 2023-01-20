@@ -3,7 +3,6 @@ import { ApiOperation, ApiTags, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/auth.dto';
 import { Response } from 'express';
-import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -24,7 +23,7 @@ export class AuthController {
     status: 500,
     description: 'Server Error',
   })
-  @Post()
+  @Post('login')
   async login(
     @Res({ passthrough: true }) res: Response, 
     @Body() body: LoginDto) {
@@ -32,7 +31,7 @@ export class AuthController {
     return this.authService.Login(res, body);
   }
 
-  //@UseGuards(AuthGuard())
+  //@UseGuards(JwtAuthGuard)
   //@ApiOperation({ summary: '로그아웃' })
   //@ApiTags('logout')
   //@ApiResponse({

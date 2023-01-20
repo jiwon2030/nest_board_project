@@ -1,8 +1,7 @@
 import { Controller, Get, Post, Body, Put, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { SignUpDTO, SignupIdCheckDTO, SignupNickNameCheckDTO, UserPwdChangeDTO } from './dto/users.dto';
+import { SignUpDTO, SignupIdCheckDTO, SignupNickNameCheckDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthGuard  } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 
 @Controller('users')
@@ -83,9 +82,9 @@ export class UsersController {
     status: 500,
     description: 'Server Error',
   })
-  @Get('user_info')
-  async userInfo(user: SignUpDTO) {
-    return await this.usersService.userInfo(user);
+  @Get('user_info/:id')
+  async userInfo(@Param() _id: UserInfoDTO) {
+    return await this.usersService.userInfo(_id);
   }
 
   @ApiTags('user')
@@ -106,5 +105,25 @@ export class UsersController {
   @Put('password')
   async passwordChange(@Body() body: UserPwdChangeDTO) {
     return await this.usersService.passwordChange(body);
+  }
+
+  @ApiTags('user')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '닉네임 변경' })
+  @ApiResponse({
+    status: 200,
+    description: '성공',
+  })
+  @ApiResponse({
+    status: 404,
+    description: '계정 존재 하지 않음',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Server Error',
+  })
+  @Put('nickname')
+  async nicknameChange(@Body() body: UserNicknameChangeDTO) {
+    return await this.usersService.nicknameChange(body);
   }
 }

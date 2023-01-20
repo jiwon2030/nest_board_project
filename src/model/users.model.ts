@@ -5,12 +5,11 @@ import {
     IsString,
     IsArray,
     IsDate,
-    IsBoolean,
     Length,
     Matches,
 } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger';
-import { CreateBoardDto } from 'src/boards/dto/board.dto';
+import { CreateBoardDTO } from 'src/boards/dto/board.dto';
 
 const options: SchemaOptions = {
     timestamps:true,
@@ -68,7 +67,7 @@ export class User extends Document {
     @Prop({
         default: [],
     })
-    boards: Array<CreateBoardDto>;
+    boards: Array<CreateBoardDTO>;
 
     @IsNotEmpty()
     @IsString()

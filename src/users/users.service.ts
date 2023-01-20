@@ -1,5 +1,5 @@
 // users.service.ts
-import { SignUpDTO, SignupIdCheckDTO, SignupNickNameCheckDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
+import { SignUpDTO, SignupIdCheckDTO, SignupNickNameCheckDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { PasswordMaker } from 'src/utils/password';
@@ -49,8 +49,8 @@ export class UsersService {
   }
 
   // 마이페이지 조회
-  async userInfo(user: SignUpDTO) {
-    return await this.usersRepository.userInfo(user);
+  async userInfo(_id: UserInfoDTO) {
+    return await this.usersRepository.userInfo(_id);
   }
 
   // 닉네임 변경
@@ -58,6 +58,9 @@ export class UsersService {
     const { id, nickname } = body;
     const idCheck = await this.usersRepository.findUseId(id);
     const nickNameCheck = await this.usersRepository.findUseNickName(nickname);
+
+
+
     const changeNickName = nickname;
     if (idCheck && !nickNameCheck) {
       await this.usersRepository.nicknameChange({

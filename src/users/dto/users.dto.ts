@@ -11,6 +11,13 @@ export class SignUpDTO extends PickType(User, [
     'password',
 ] as const) {}
 
+export class UserInfoDTO extends PickType(User, [
+    '_id',
+    'nickname'
+] as const ) {
+  id: string;
+}
+
 export class UserNicknameChangeDTO extends PickType(User, ['id'] as const) {
     @ApiProperty({
         example: 'testnickname',
