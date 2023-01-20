@@ -27,7 +27,7 @@ export class Board extends Document {
         description: 'uid',
         required: true,
     })
-    uid: string;
+    uid: string; // 게시판 고유 id
 
     @IsNotEmpty()
     @IsString()
@@ -39,7 +39,7 @@ export class Board extends Document {
         description: 'userID',
         required: true,
     })
-    userID: string;
+    userID: string; // 작성자 id
 
     @IsNotEmpty()
     @IsString()
@@ -51,7 +51,7 @@ export class Board extends Document {
         description: 'title',
         required: true,
     })
-    title: string;
+    title: string; // 제목
 
     @IsNotEmpty()
     @IsString()
@@ -63,31 +63,29 @@ export class Board extends Document {
         description: 'content',
         required: true,
     })
-    content: string;
+    content: string; // 내용
 
     @IsArray()
     @Prop({
         default: [],
     })
-    comments: Array<CreateCommentDto>;
+    comments: Array<CreateCommentDto>; // 댓글
 
     @IsNotEmpty()
     @IsDate()
     @Prop({
-        required:true,
         default: new Date(),
         type: mongoose.Schema.Types.Date,
     })
-    createdAt: Date;
+    createdAt: Date; // 작성 날짜
 
     @IsNotEmpty()
     @IsDate()
     @Prop({
-        required:true,
         default: new Date(),
         type: mongoose.Schema.Types.Date,
     })
-    updatedAt: Date;
+    updatedAt: Date; // 수정 날짜
 }
 
 export const BoardSchema = SchemaFactory.createForClass(Board);

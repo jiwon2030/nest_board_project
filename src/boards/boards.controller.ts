@@ -1,8 +1,7 @@
 import { Controller, UseGuards, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { BoardsService } from './boards.service';
-import { CreateBoardDto, UpdateBoardDto } from './dto/board.dto';
+import { BoardFindBasicDTO, CreateBoardDTO, LoginUserCheckDTO, UpdateBoardDTO } from './dto/board.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 
 @Controller('boards')
@@ -13,41 +12,44 @@ export class BoardsController {
   @ApiTags('board')
   @Get('/')
   async getAllBoard() {
-    return this.boardsService.getAllBoards();
+    return await this.boardsService.getAllBoards();
   }
 
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시판 글 등록'})
   @ApiTags('board')
-  @Post()
-  async createBoard(@Req() req, @Body() board: CreateBoardDto) {
-      return this.boardsService.createBoard(req.user, board);
+  @Post('create')
+  async createBoard(@Req() user, @Body() board: CreateBoardDTO) {
+      return await this.boardsService.createBoard(user, board);
   }
 
   @ApiOperation({ summary: '게시판 글 상세 페이지'})
   @ApiTags('board')
-  @Get(':id')
-  async getBoardById(@Param('id') uid: CreateBoardDto) {
-    return this.boardsService.getBoardById(uid); 
+  @Get(':uid')
+  async getBoardById(@Param() _id: BoardFindBasicDTO) {
+    return await this.boardsService.getBoardById(_id); 
   }
 
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시판 글 수정'})
   @ApiTags('board')
-  @Patch(':id')
+  @Patch(':uid')
   async updateBoard(
-    @Param('uid') uid: string,
-    @Req() req,
-    @Body() updateBoardDto: UpdateBoardDto
+    @Param('uid') _id: BoardFindBasicDTO,
+    @Req() user: LoginUserCheckDTO,
+    @Body() updateBoardDTO: UpdateBoardDTO
   ) {
-    return this.boardsService.updateBoard(uid, req.user, updateBoardDto);
+    return await this.boardsService.updateBoard(_id, user, updateBoardDTO);
   }
   
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시판 글 삭제'})
   @ApiTags('board')
-  @Delete(':id')
-  async deleteBoard(@Param('uid') uid: string, @Req() req) {
-    this.boardsService.deleteBoard(uid, req.user);
+  @Delete(':uid')
+  async deleteBoard(
+    @Param('uid') _id: BoardFindBasicDTO, 
+    @Req() user: LoginUserCheckDTO
+    ) {
+    return await this.boardsService.deleteBoard(_id, user);
   }
 }
