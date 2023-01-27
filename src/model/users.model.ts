@@ -3,13 +3,11 @@ import mongoose, { Document } from 'mongoose';
 import {
     IsNotEmpty,
     IsString,
-    IsArray,
     IsDate,
     Length,
     Matches,
 } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger';
-import { CreateBoardDTO } from 'src/boards/dto/board.dto';
 
 const options: SchemaOptions = {
     timestamps:true,
@@ -35,12 +33,6 @@ export class User extends Document {
     @IsNotEmpty()
     @IsString()
     @Length(8-16)
-    @Matches(
-        /^(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]){8,16}$/,
-        {
-          message: '비밀번호 양식에 맞게 작성하세요.',
-        },
-      )
     @Prop({
         required: true,
     })
@@ -62,12 +54,6 @@ export class User extends Document {
         required: true,
     })
     nickname: string;
-
-    @IsArray()
-    @Prop({
-        default: [],
-    })
-    boards: Array<CreateBoardDTO>;
 
     @IsNotEmpty()
     @IsString()
