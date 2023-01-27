@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CommentRepository } from './comments.repository';
-import { CommentFindBasicDto, CreateCommentDto, UpdateCommentDto } from './dto/comment.dto';
+import { BoardIDFindDTO, CommentFindBasicDTO, CreateCommentDTO, LoginUserCheckDTO, UpdateCommentDTO } from './dto/comment.dto';
 
 @Injectable()
 export class CommentsService {
@@ -10,15 +10,15 @@ export class CommentsService {
     return await this.commentRepository.getAllComments();
   }
 
-  async createComment(loginUser: CommentFindBasicDto, data: CreateCommentDto) {
-    return await this.commentRepository.createComment(loginUser, data);
+  async createComment(loginUser: LoginUserCheckDTO, boardId: BoardIDFindDTO, data: CreateCommentDTO) {
+    return await this.commentRepository.createComment(loginUser, boardId, data);
   }
 
-  async updateComment(uid: string, loginUser: CreateCommentDto, updateCommentDto: UpdateCommentDto) {
-    return await this.commentRepository.updateComment(uid, loginUser, updateCommentDto)
+  async updateComment(user: LoginUserCheckDTO, _id: CommentFindBasicDTO, updateCommentDTO: UpdateCommentDTO) {
+    return await this.commentRepository.updateComment(user, _id, updateCommentDTO)
   }
 
-  async deleteComment(_id: string, loginUser: CreateCommentDto) {
-    return await this.commentRepository.deleteComment(_id, loginUser)
+  async deleteComment(loginUser: LoginUserCheckDTO, _id: CommentFindBasicDTO) {
+    return await this.commentRepository.deleteComment(loginUser, _id)
   }
 }
