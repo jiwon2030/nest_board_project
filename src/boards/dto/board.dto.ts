@@ -3,7 +3,7 @@ import { User } from '../../model/users.model'
 import { Board } from '../../model/boards.model'
 
 export class LoginUserCheckDTO extends PickType(User, ['_id'] as const) { 
-    _id: string
+    _id: string;
 }
 
 export class CreateBoardDTO {
@@ -11,7 +11,6 @@ export class CreateBoardDTO {
     userID: string; // 게시글 작성자 id
     title: string; // 제목
     content: string; // 내용
-    createdAt: Date; // 작성 날짜
 }
 
 export class BoardFindBasicDTO extends PickType (Board, [
@@ -19,7 +18,6 @@ export class BoardFindBasicDTO extends PickType (Board, [
     'title',
     'content',
     'userID',
-    'createdAt'
 ] as const) {
     uid: string;
 }

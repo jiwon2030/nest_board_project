@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LoginUserCheckDTO, CreateBoardDTO, UpdateBoardDTO, BoardFindBasicDTO } from './dto/board.dto'
 import { BoardRepository } from './boards.repository';
 
@@ -18,12 +18,12 @@ export class BoardsService {
     return await this.boardRepository.getBoardById(_id);
   }
 
-  async updateBoard(_id: BoardFindBasicDTO, user: LoginUserCheckDTO, updateBoardDTO: UpdateBoardDTO) {
-    return await this.boardRepository.updateBoard(_id, user, updateBoardDTO)
+  async updateBoard(user: LoginUserCheckDTO, _id: BoardFindBasicDTO, updateBoardDTO: UpdateBoardDTO) {
+    return await this.boardRepository.updateBoard(user, _id, updateBoardDTO)
   }
 
-  async deleteBoard(_id: BoardFindBasicDTO, loginUser: LoginUserCheckDTO) {
-    return await this.boardRepository.deleteBoard(_id, loginUser)
+  async deleteBoard(loginUser: LoginUserCheckDTO, _id: BoardFindBasicDTO) {
+    return await this.boardRepository.deleteBoard(loginUser, _id)
   }
 }
 

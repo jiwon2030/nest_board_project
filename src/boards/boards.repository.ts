@@ -6,12 +6,14 @@ import { Board } from 'src/model/boards.model';
 import { v1 as uuid_v1 } from 'uuid';
 import { UpdateBoardDTO, CreateBoardDTO, LoginUserCheckDTO, BoardFindBasicDTO } from './dto/board.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
+import { CommentRepository } from 'src/comments/comments.repository';
 
 @Injectable()
 export class BoardRepository {
     constructor(
         @InjectModel(User.name) private readonly userModel: Model<User>,
         @InjectModel(Board.name) private readonly boardModel: Model<Board>,
+        private readonly commentRepository: CommentRepository,
     ) { }
 
     // 게시판 글 전체 리스트 페이지
@@ -20,9 +22,9 @@ export class BoardRepository {
     }
  
     // 사용자가 작성한 게시판 확인
-    private async boardVerify(_id: BoardFindBasicDTO, loginUser: LoginUserCheckDTO) {
-        const findBoard = await this.boardModel.findOne({ _id });
-        const findUser = await this.userModel.findOne({ id: loginUser._id });
+    private async boardVerify(loginUser: LoginUserCheckDTO, _id: BoardFindBasicDTO) {
+        const findBoard = await this.boardModel.findOne({ _id }).exec();
+        const findUser = await this.userModel.findOne({ _id: loginUser._id }).exec();
 
         if(!findBoard) {
             throw new NotFoundException();
@@ -30,7 +32,7 @@ export class BoardRepository {
         if(!findUser) {
             throw new ForbiddenException();
         }
-        if(findBoard.userID != findUser.id) {
+        if(findUser._id != findBoard.userID) {
             throw new ForbiddenException();
         }
         return findBoard;
@@ -38,8 +40,8 @@ export class BoardRepository {
 
     // 게시판 글 등록
     async createBoard(user: LoginUserCheckDTO, data: CreateBoardDTO) {
-        const loginUser = await this.userModel.findOne({ _id: user._id }); 
-        console.log(loginUser);
+        const loginUser = await this.userModel.findOne({ _id: user._id }).exec(); 
+        console.log("loginUser:", loginUser);
 
         if(!loginUser) {
             throw new ForbiddenException("권한이 없습니다.");
@@ -48,13 +50,9 @@ export class BoardRepository {
             const uid = uuid_v1();
             const title = data.title;
             const content = data.content;
-            const userID = loginUser._id;
-            const createdAt = new Date;
-       
-            const board: CreateBoardDTO = { uid, userID, title, content, createdAt };
+            const userID = loginUser._id;   
+            const board: CreateBoardDTO = { uid, userID, title, content };
 
-            loginUser.boards.push(board);
-            loginUser.save();
             return this.boardModel.create(board);    
         }                    
     }
@@ -64,7 +62,7 @@ export class BoardRepository {
         const boardID = _id.uid;
         const board = await this.boardModel
         .findOne({ boardID })
-        .select({ _id: 0, title: 1, content: 1 , userID: 1, craetedAt: 1 });
+        .select({ _id: 0, title: 1, content: 1 , userID: 1 });
         if (board) {
             return board;
         }
@@ -74,10 +72,10 @@ export class BoardRepository {
     }
 
     // 게시판 글 수정
-    async updateBoard(_id: BoardFindBasicDTO, user: LoginUserCheckDTO, updateBoardDTO: UpdateBoardDTO) {
-        const loginUser = await this.userModel.findOne({ _id: user._id }); 
+    async updateBoard(user: LoginUserCheckDTO, _id: BoardFindBasicDTO, updateBoardDTO: UpdateBoardDTO) {
+        const loginUser = await this.userModel.findOne({ _id: user._id }).exec(); 
         console.log("loginUser:", loginUser);
-        const board = await this.boardVerify(_id, loginUser);
+        const board = await this.boardVerify(loginUser, _id);
         console.log("board:", board);
 
         if(!board) {
@@ -86,26 +84,25 @@ export class BoardRepository {
         else {
             board.title = updateBoardDTO.title;
             board.content = updateBoardDTO.content;
-
-            board.save();
-            console.log(board);
-            loginUser.boards.push(board);
-            loginUser.save();
-            console.log(loginUser);
-            return board;
+            return await board.save();
         }      
     }
 
     // 게시판 글 삭제
-    async deleteBoard(_id: BoardFindBasicDTO, user: LoginUserCheckDTO) { 
-        const loginUser = await this.userModel.findOne({ _id: user._id });
-        const board = await this.boardVerify(_id, loginUser);
-        console.log(board);
+    async deleteBoard(user: LoginUserCheckDTO, _id: BoardFindBasicDTO) { 
+        const loginUser = await this.userModel.findOne({ _id: user._id }).exec();
+        console.log("loginUser:", loginUser);
+        const board = await this.boardVerify(loginUser, _id);
+        console.log("board:", board);
         if(!board) {
             throw new ForbiddenException();
         }
         else {
-            return await this.boardModel.deleteOne({ uid: board._id });
+            await this.boardModel.deleteOne({ _id });
+            while (board) {
+                await this.commentRepository.deleteComment(loginUser, _id);
+            }
+            return "게시판이 삭제되었습니다.";
         }        
     }
 }

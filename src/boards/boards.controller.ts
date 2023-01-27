@@ -1,8 +1,9 @@
-import { Controller, UseGuards, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { BoardsService } from './boards.service';
 import { BoardFindBasicDTO, CreateBoardDTO, LoginUserCheckDTO, UpdateBoardDTO } from './dto/board.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
+import { CurrentUser } from 'src/common/decorators/user.decorator';
 
 @Controller('boards')
 export class BoardsController {
@@ -19,7 +20,7 @@ export class BoardsController {
   @ApiOperation({ summary: '게시판 글 등록'})
   @ApiTags('board')
   @Post('create')
-  async createBoard(@Req() user, @Body() board: CreateBoardDTO) {
+  async createBoard(@CurrentUser() user: LoginUserCheckDTO, @Body() board: CreateBoardDTO) {
       return await this.boardsService.createBoard(user, board);
   }
 
@@ -35,11 +36,11 @@ export class BoardsController {
   @ApiTags('board')
   @Patch(':uid')
   async updateBoard(
-    @Param('uid') _id: BoardFindBasicDTO,
-    @Req() user: LoginUserCheckDTO,
+    @CurrentUser() user: LoginUserCheckDTO,
+    @Param('uid') _id: BoardFindBasicDTO,    
     @Body() updateBoardDTO: UpdateBoardDTO
   ) {
-    return await this.boardsService.updateBoard(_id, user, updateBoardDTO);
+    return await this.boardsService.updateBoard(user, _id, updateBoardDTO);
   }
   
   @UseGuards(JwtAuthGuard)
@@ -47,9 +48,9 @@ export class BoardsController {
   @ApiTags('board')
   @Delete(':uid')
   async deleteBoard(
-    @Param('uid') _id: BoardFindBasicDTO, 
-    @Req() user: LoginUserCheckDTO
+    @CurrentUser() user: LoginUserCheckDTO,
+    @Param('uid') _id: BoardFindBasicDTO,
     ) {
-    return await this.boardsService.deleteBoard(_id, user);
+    return await this.boardsService.deleteBoard(user, _id);
   }
 }
