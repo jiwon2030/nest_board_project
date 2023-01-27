@@ -58,7 +58,7 @@ export class Comment extends Document {
         default: new Date(),
         type: mongoose.Schema.Types.Date,
     })
-    createdAt: Date;
+    create_date: Date;
 
     @IsNotEmpty()
     @IsDate()
@@ -67,7 +67,7 @@ export class Comment extends Document {
         default: new Date(),
         type: mongoose.Schema.Types.Date,
     })
-    updatedAt: Date;
+    update_date: Date;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
