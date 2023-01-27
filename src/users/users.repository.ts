@@ -1,5 +1,5 @@
 // users.repository.ts
-import { SignUpDTO, UserInfoDTO } from './dto/users.dto';
+import { FindLoginUserDTO, SignUpDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -14,8 +14,8 @@ export class UsersRepository {
   ) {}
 
   // id 중복여부 확인
-  async findUseId(id: string) {
-    const user = await this.userModel.findOne({ id }).select({ _id: 1, id: 1 });
+  async findUserId(id: string) {
+    const user = await this.userModel.findOne({ id }).select({ _id: 1, id: 1 }).exec();
     if (user) {
       return true;
     } else {
@@ -24,8 +24,8 @@ export class UsersRepository {
   }
 
   // 닉네임 중복여부 확인
-  async findUseNickName(nickname: string) {
-    const user = await this.userModel.findOne({ nickname }).select({ _id: 1 });
+  async findUserNickName(nickname: string) {
+    const user = await this.userModel.findOne({ nickname }).select({ _id: 1 }).exec();
     if (user) {
       return true;
     } else {
@@ -35,7 +35,7 @@ export class UsersRepository {
 
   // 회원가입
   async signUp({ id, nickname, password }: SignUpDTO) {
-    const user = await this.userModel.findOne({ id, nickname });
+    const user = await this.userModel.findOne({ id, nickname }).exec();
     if (!user) {
         const makePassword = PasswordMaker(password);
         console.log(makePassword)
@@ -52,14 +52,12 @@ export class UsersRepository {
   }
 
   // 마이페이지 조회
-  async userInfo(_id: UserInfoDTO) {
-    const userID = _id.id;
-    //console.log(userID);
+  async userInfo(user: UserInfoDTO) {
+    const { _id } = user;
     const user_info = await this.userModel
-        .findOne({ userID })
-        .select({ _id: 0, id: 1, nickname: 1 });
+        .findOne({ _id })
+        .select({ _id: 0, id: 1, nickname: 1 }).exec();
     if (user_info) {
-      //console.log(userID);
       return user_info;
     }
     else {
@@ -68,12 +66,36 @@ export class UsersRepository {
   }
 
   // 닉네임 변경
-  async nicknameChange({ id, nickname }) {
-    await this.userModel.updateOne({ id }, { nickname });
+  async nicknameChange(user: FindLoginUserDTO, body: UserNicknameChangeDTO) {
+    const { id } = user;
+    console.log("user:", user);
+    const { nickname } = body;
+    const idCheck = await this.findUserId(id);
+    const nickNameCheck = await this.findUserNickName(nickname);
+    console.log("idcheck:", idCheck);
+    console.log("nickNameCheck:", nickNameCheck);
+    const changeNickName = nickname;
+    if (idCheck && !nickNameCheck) {
+      await this.userModel.updateOne({ id }, { changeNickName });
+      return '닉네임 변경 완료';
+    }
+    else { throw new NotFoundException("닉네임 변경 실패했습니다."); }
+    
   }
 
   // 비밀번호 변경
-  async passwordChange({ id, password, salt }) {
-    await this.userModel.updateOne({ id }, { password, salt });
+  async passwordChange(user: FindLoginUserDTO, body: UserPwdChangeDTO) {
+    const { id } = user;
+    console.log("user:", user);
+    const { password, salt } = body;
+    const idCheck = await this.findUserId(id);
+    console.log("idcheck:", idCheck);
+    if (idCheck) {
+      const changePassword = PasswordMaker(password);
+      const changeSalt = PasswordMaker(salt);
+      await this.userModel.updateOne({ id }, { changePassword, changeSalt });
+      return '비밀번호 변경 완료';
+    } 
+    else { throw new NotFoundException("비밀번호 변경 실패했습니다."); }
   }
 }
