@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Put, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { SignUpDTO, SignupIdCheckDTO, SignupNickNameCheckDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
+import { FindLoginUserDTO, SignUpDTO, SignupIdCheckDTO, SignupNickNameCheckDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
+import { CurrentUser } from 'src/common/decorators/user.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -82,9 +83,9 @@ export class UsersController {
     status: 500,
     description: 'Server Error',
   })
-  @Get('user_info/:id')
-  async userInfo(@Param() _id: UserInfoDTO) {
-    return await this.usersService.userInfo(_id);
+  @Get('user_info')
+  async userInfo(@CurrentUser() user: UserInfoDTO) {
+    return await this.usersService.userInfo(user);
   }
 
   @ApiTags('user')
@@ -103,8 +104,11 @@ export class UsersController {
     description: 'Server Error',
   })
   @Put('password')
-  async passwordChange(@Body() body: UserPwdChangeDTO) {
-    return await this.usersService.passwordChange(body);
+  async passwordChange(
+    @CurrentUser() user: FindLoginUserDTO, 
+    @Body() body: UserPwdChangeDTO
+  ) {
+    return await this.usersService.passwordChange(user, body);
   }
 
   @ApiTags('user')
@@ -123,7 +127,10 @@ export class UsersController {
     description: 'Server Error',
   })
   @Put('nickname')
-  async nicknameChange(@Body() body: UserNicknameChangeDTO) {
-    return await this.usersService.nicknameChange(body);
+  async nicknameChange(
+    @CurrentUser() user: FindLoginUserDTO,
+    @Body() body: UserNicknameChangeDTO,
+  ) {
+    return await this.usersService.nicknameChange(user, body);
   }
 }
