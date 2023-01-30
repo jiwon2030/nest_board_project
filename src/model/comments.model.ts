@@ -45,29 +45,23 @@ export class Comment extends Document {
         required: true,
     })
     @ApiProperty({
+        example: 'testboardID',
+        description: 'boardID',
+        required: true,
+    })
+    boardID: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @Prop({
+        required: true,
+    })
+    @ApiProperty({
         example: 'testcontent',
         description: 'content',
         required: true,
     })
     content: string;
-
-    @IsNotEmpty()
-    @IsDate()
-    @Prop({
-        required:true,
-        default: new Date(),
-        type: mongoose.Schema.Types.Date,
-    })
-    create_date: Date;
-
-    @IsNotEmpty()
-    @IsDate()
-    @Prop({
-        required:true,
-        default: new Date(),
-        type: mongoose.Schema.Types.Date,
-    })
-    update_date: Date;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
