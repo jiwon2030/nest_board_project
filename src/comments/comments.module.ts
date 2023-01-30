@@ -4,7 +4,7 @@ import { CommentsController } from './comments.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/model/users.model';
 import { Comment, CommentSchema } from 'src/model/comments.model';
-import { LoginUserCheckDTO } from './dto/comment.dto';
+import { BoardIDFindDTO, LoginUserCheckDTO } from './dto/comment.dto';
 import { CommentRepository } from './comments.repository';
 import { Board, BoardSchema } from 'src/model/boards.model';
 
@@ -16,7 +16,7 @@ import { Board, BoardSchema } from 'src/model/boards.model';
       { name: Comment.name, schema: CommentSchema }]),
   ],
   controllers: [CommentsController],
-  providers: [CommentsService, LoginUserCheckDTO, CommentRepository],
-  exports: [LoginUserCheckDTO, CommentRepository]
+  providers: [CommentsService, BoardIDFindDTO, LoginUserCheckDTO, CommentRepository],
+  exports: [LoginUserCheckDTO, BoardIDFindDTO, CommentRepository]
 })
 export class CommentsModule {}

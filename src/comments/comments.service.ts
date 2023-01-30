@@ -14,11 +14,11 @@ export class CommentsService {
     return await this.commentRepository.createComment(loginUser, boardId, data);
   }
 
-  async updateComment(user: LoginUserCheckDTO, _id: CommentFindBasicDTO, updateCommentDTO: UpdateCommentDTO) {
-    return await this.commentRepository.updateComment(user, _id, updateCommentDTO)
+  async updateComment(user: LoginUserCheckDTO, uid: CommentFindBasicDTO, updateCommentDTO: UpdateCommentDTO) {
+    return await this.commentRepository.updateComment(user, uid, updateCommentDTO)
   }
 
-  async deleteComment(loginUser: LoginUserCheckDTO, _id: CommentFindBasicDTO) {
-    return await this.commentRepository.deleteComment(loginUser, _id)
+  async deleteComment(loginUser: LoginUserCheckDTO, uid: CommentFindBasicDTO) {
+    return await this.commentRepository.deleteComment(loginUser, uid)
   }
 }

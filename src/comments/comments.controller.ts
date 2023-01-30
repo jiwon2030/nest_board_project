@@ -19,35 +19,35 @@ export class CommentsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '댓글 등록'})
   @ApiTags('comment')
-  @Post('create')
+  @Post('/create/:uid')
   async createComment(
     @CurrentUser() user: LoginUserCheckDTO,    
-    @Param('_id') board: BoardIDFindDTO, 
+    @Param('uid') boardId: BoardIDFindDTO, 
     @Body() comment: CreateCommentDTO) {
-      return await this.commentsService.createComment(user, board, comment);
+      return await this.commentsService.createComment(user, boardId, comment);
   }
 
 
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '댓글 수정'})
   @ApiTags('comment')
-  @Patch(':uid')
+  @Patch('/:uid')
   async updateComment(
     @CurrentUser() user: LoginUserCheckDTO,
-    @Param('uid') _id: CommentFindBasicDTO,    
+    @Param('uid') uid: CommentFindBasicDTO,    
     @Body() updateCommentDTO: UpdateCommentDTO
   ) {
-    return await this.commentsService.updateComment(user, _id, updateCommentDTO);
+    return await this.commentsService.updateComment(user, uid, updateCommentDTO);
   }
   
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '댓글 삭제'})
   @ApiTags('comment')
-  @Delete(':uid')
+  @Delete('/:uid')
   async deleteComment(
     @CurrentUser() user: LoginUserCheckDTO,
-    @Param('uid') _id: CommentFindBasicDTO,
+    @Param('uid') uid: CommentFindBasicDTO,
     ) {
-    return await this.commentsService.deleteComment(user, _id);
+    return await this.commentsService.deleteComment(user, uid);
   }
 }

@@ -18,22 +18,23 @@ export class CommentRepository {
 
     // 댓글 전체 리스트 페이지
     async getAllComments() { 
-       return this.commentModel.find();
+       return this.commentModel.find({ });
     }
   
      // 사용자가 작성한 댓글 확인
-     private async commentVerify(loginUser: LoginUserCheckDTO, _id: CommentFindBasicDTO) {
-         const findComment = await this.commentModel.findOne({ _id }).exec();
+     async commentVerify(loginUser: LoginUserCheckDTO, uid: CommentFindBasicDTO) {
+         const findComment = await this.commentModel.findOne({ uid }).exec();
+         console.log(findComment);
          const findUser = await this.userModel.findOne({ _id: loginUser._id }).exec();
  
          if(!findComment) {
-             throw new NotFoundException();
+             throw new NotFoundException("댓글을 찾을 수 없습니다.");
          }
          if(!findUser) {
-             throw new ForbiddenException();
+             throw new ForbiddenException("사용자를 찾을 수 없습니다.");
          }
          if(findUser._id != findComment.userID) {
-             throw new ForbiddenException();
+             throw new ForbiddenException("작성한 댓글이 아닙니다.");
          }
          return findComment;
      }
@@ -42,7 +43,8 @@ export class CommentRepository {
      async createComment(user: LoginUserCheckDTO, boardId: BoardIDFindDTO, data: CreateCommentDTO) {
          const loginUser = await this.userModel.findOne({ _id: user._id }).exec(); 
          console.log("loginUser:", loginUser);
-         const board = await this.boardModel.findOne({ _id: boardId?._id }).exec();
+         console.log(boardId);
+         const board = await this.boardModel.findOne({ boardId }).exec();
          console.log("board:", board);
          
  
@@ -64,10 +66,11 @@ export class CommentRepository {
      }
  
      // 댓글 수정
-     async updateComment(user: LoginUserCheckDTO, _id: CommentFindBasicDTO, updateCommentDTO: UpdateCommentDTO) {
+     async updateComment(user: LoginUserCheckDTO, uid: CommentFindBasicDTO, updateCommentDTO: UpdateCommentDTO) {
          const loginUser = await this.userModel.findOne({ _id: user._id }).exec(); 
-         console.log("loginUser:", loginUser);
-         const comment = await this.commentVerify(loginUser, _id);
+         //console.log("loginUser:", loginUser);
+         console.log(uid);
+         const comment = await this.commentVerify(loginUser, uid);
          console.log("comment:", comment);
  
          if(!comment) {
@@ -80,15 +83,15 @@ export class CommentRepository {
      }
  
      // 댓글 삭제
-     async deleteComment(user: LoginUserCheckDTO, _id: CommentFindBasicDTO) { 
+     async deleteComment(user: LoginUserCheckDTO, uid: CommentFindBasicDTO) { 
          const loginUser = await this.userModel.findOne({ _id: user._id }).exec();
-         const comment = await this.commentVerify(loginUser, _id);
+         const comment = await this.commentVerify(loginUser, uid);
          if(!comment) {
              throw new ForbiddenException();
          }
          else {
-             await this.commentModel.deleteOne({ _id: comment._id });
-             return comment;
+             await this.commentModel.deleteOne({ uid });
+             return "댓글이 삭제되었습니다.";
          }        
      }
 }
