@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { FindLoginUserDTO, SignUpDTO, SignupIdCheckDTO, SignupNickNameCheckDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
+import { FindLoginUserDTO, SignUpDTO, SignupIdCheckDTO, SignupNickNameCheckDTO, testFindLoginUserDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
@@ -85,6 +85,7 @@ export class UsersController {
   })
   @Get('user_info')
   async userInfo(@CurrentUser() user: UserInfoDTO) {
+    console.log(user);
     return await this.usersService.userInfo(user);
   }
 
@@ -105,9 +106,11 @@ export class UsersController {
   })
   @Put('password')
   async passwordChange(
-    @CurrentUser() user: FindLoginUserDTO, 
+    @CurrentUser() user: UserInfoDTO, 
     @Body() body: UserPwdChangeDTO
   ) {
+    console.log(user);
+    console.log(body);
     return await this.usersService.passwordChange(user, body);
   }
 

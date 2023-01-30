@@ -1,5 +1,5 @@
 // users.repository.ts
-import { FindLoginUserDTO, SignUpDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
+import { FindLoginUserDTO, SignUpDTO, testFindLoginUserDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -15,7 +15,8 @@ export class UsersRepository {
 
   // id 중복여부 확인
   async findUserId(id: string) {
-    const user = await this.userModel.findOne({ id }).select({ _id: 1, id: 1 }).exec();
+    console.log(id);
+    const user = await this.userModel.findOne({ id }).exec();
     if (user) {
       return true;
     } else {
@@ -68,34 +69,25 @@ export class UsersRepository {
   // 닉네임 변경
   async nicknameChange(user: FindLoginUserDTO, body: UserNicknameChangeDTO) {
     const { id } = user;
-    console.log("user:", user);
     const { nickname } = body;
-    const idCheck = await this.findUserId(id);
-    const nickNameCheck = await this.findUserNickName(nickname);
-    console.log("idcheck:", idCheck);
-    console.log("nickNameCheck:", nickNameCheck);
-    const changeNickName = nickname;
-    if (idCheck && !nickNameCheck) {
-      await this.userModel.updateOne({ id }, { changeNickName });
-      return '닉네임 변경 완료';
-    }
-    else { throw new NotFoundException("닉네임 변경 실패했습니다."); }
-    
+    await this.userModel.updateOne({ id }, { id, nickname });
   }
 
   // 비밀번호 변경
-  async passwordChange(user: FindLoginUserDTO, body: UserPwdChangeDTO) {
-    const { id } = user;
-    console.log("user:", user);
+  async passwordChange(user: testFindLoginUserDTO, body: UserPwdChangeDTO) {
+    const user_id = user._id;
+    console.log('ggg');
+    console.log(user_id);
     const { password, salt } = body;
-    const idCheck = await this.findUserId(id);
-    console.log("idcheck:", idCheck);
-    if (idCheck) {
-      const changePassword = PasswordMaker(password);
-      const changeSalt = PasswordMaker(salt);
-      await this.userModel.updateOne({ id }, { changePassword, changeSalt });
-      return '비밀번호 변경 완료';
-    } 
-    else { throw new NotFoundException("비밀번호 변경 실패했습니다."); }
+    const user_info = await this.userModel
+        .findOne({ _id: user_id })
+        .select({ _id: 0, id: 1, nickname: 1 }).exec();
+    
+    console.log('ggg')
+    console.log(user_info);
+
+    await this.userModel.updateOne({ _id: user._id }, { password, salt });
+
+    return;
   }
 }
