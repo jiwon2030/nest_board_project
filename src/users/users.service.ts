@@ -1,5 +1,5 @@
 // users.service.ts
-import { FindLoginUserDTO, SignUpDTO, SignupIdCheckDTO, SignupNickNameCheckDTO, testFindLoginUserDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
+import { FindLoginUserDTO, SignUpDTO, SignupIdCheckDTO, SignupNickNameCheckDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { PasswordMaker } from 'src/utils/password';
@@ -59,22 +59,31 @@ export class UsersService {
 
   // 닉네임 변경
   async nicknameChange(user: FindLoginUserDTO, body: UserNicknameChangeDTO) {
-    const { id } = user;
+    const userinfo_id = user._id;    
+    const user_info = await this.userModel.findOne({ _id: userinfo_id });   
+    const { id } = user_info;
     console.log("user:", user);
     const { _id, nickname } = body;
+    const body_id = body.id;
+    const body_nickname = body.nickname;
     const idCheck = await this.usersRepository.findUserId(id);
     const nickNameCheck = await this.usersRepository.findUserNickName(nickname);
     console.log("idcheck:", idCheck);
     console.log("nickNameCheck:", nickNameCheck);
     if (idCheck && !nickNameCheck) {
-      await this.usersRepository.nicknameChange(_id, { nickname });
+      await this.usersRepository.nicknameChange(
+        user,
+        {
+        id: body_id, 
+        nickname: body_nickname
+        });
       return user;
     }
     else { throw new NotFoundException("닉네임 변경 실패했습니다."); }
   }
 
   // 비밀번호 변경
-  async passwordChange(user: testFindLoginUserDTO, body: UserPwdChangeDTO) {
+  async passwordChange(user: FindLoginUserDTO, body: UserPwdChangeDTO) {
     const userinfo_id = user._id;
     const user_info = await this.userModel.findOne({ _id: userinfo_id });
     const { id } = user_info;

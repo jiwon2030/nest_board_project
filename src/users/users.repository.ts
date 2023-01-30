@@ -1,5 +1,5 @@
 // users.repository.ts
-import { FindLoginUserDTO, SignUpDTO, testFindLoginUserDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
+import { FindLoginUserDTO, SignUpDTO, UserInfoDTO, UserNicknameChangeDTO, UserPwdChangeDTO } from './dto/users.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -68,26 +68,15 @@ export class UsersRepository {
 
   // 닉네임 변경
   async nicknameChange(user: FindLoginUserDTO, body: UserNicknameChangeDTO) {
-    const { id } = user;
+    const { _id } = user;
     const { nickname } = body;
-    await this.userModel.updateOne({ id }, { id, nickname });
+    await this.userModel.updateOne({ _id }, { nickname });
   }
 
   // 비밀번호 변경
-  async passwordChange(user: testFindLoginUserDTO, body: UserPwdChangeDTO) {
-    const user_id = user._id;
-    console.log('ggg');
-    console.log(user_id);
+  async passwordChange(user: FindLoginUserDTO, body: UserPwdChangeDTO) {
+    const { _id } = user;
     const { password, salt } = body;
-    const user_info = await this.userModel
-        .findOne({ _id: user_id })
-        .select({ _id: 0, id: 1, nickname: 1 }).exec();
-    
-    console.log('ggg')
-    console.log(user_info);
-
-    await this.userModel.updateOne({ _id: user._id }, { password, salt });
-
-    return;
+    return await this.userModel.updateOne({ _id }, { password, salt });
   }
 }
