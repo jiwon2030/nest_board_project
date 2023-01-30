@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LoginUserCheckDTO, CreateBoardDTO, UpdateBoardDTO, BoardFindBasicDTO } from './dto/board.dto'
 import { BoardRepository } from './boards.repository';
+import { CommentFindBasicDTO } from 'src/comments/dto/comment.dto';
 
 @Injectable()
 export class BoardsService {

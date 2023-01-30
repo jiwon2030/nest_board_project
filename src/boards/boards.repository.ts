@@ -7,13 +7,15 @@ import { v1 as uuid_v1 } from 'uuid';
 import { UpdateBoardDTO, CreateBoardDTO, LoginUserCheckDTO, BoardFindBasicDTO } from './dto/board.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
 import { CommentRepository } from 'src/comments/comments.repository';
+import { CommentFindBasicDTO } from 'src/comments/dto/comment.dto';
+import { Comment } from 'src/model/comments.model';
 
 @Injectable()
 export class BoardRepository {
     constructor(
         @InjectModel(User.name) private readonly userModel: Model<User>,
         @InjectModel(Board.name) private readonly boardModel: Model<Board>,
-        private readonly commentRepository: CommentRepository,
+        @InjectModel(Comment.name) private readonly commentModel: Model<Comment>,
     ) { }
 
     // 게시판 글 전체 리스트 페이지
@@ -22,18 +24,19 @@ export class BoardRepository {
     }
  
     // 사용자가 작성한 게시판 확인
-    private async boardVerify(loginUser: LoginUserCheckDTO, _id: BoardFindBasicDTO) {
-        const findBoard = await this.boardModel.findOne({ _id }).exec();
+    async boardVerify(loginUser: LoginUserCheckDTO, uid: BoardFindBasicDTO) {
+        const findBoard = await this.boardModel.findOne({ uid }).exec();
+        console.log(findBoard);
         const findUser = await this.userModel.findOne({ _id: loginUser._id }).exec();
 
         if(!findBoard) {
-            throw new NotFoundException();
+            throw new NotFoundException("게시글을 찾을 수 없습니다.");
         }
         if(!findUser) {
-            throw new ForbiddenException();
+            throw new ForbiddenException("사용자를 찾을 수 없습니다.");
         }
         if(findUser._id != findBoard.userID) {
-            throw new ForbiddenException();
+            throw new ForbiddenException("작성한 게시글이 아닙니다.");
         }
         return findBoard;
     }
@@ -58,13 +61,22 @@ export class BoardRepository {
     }
 
     // 게시판 글 상세 페이지
-    async getBoardById(_id: BoardFindBasicDTO) {
-        const boardID = _id.uid;
+    async getBoardById(uid) {
+        console.log(uid);
+        const boardID = uid.id;
         const board = await this.boardModel
-        .findOne({ boardID })
+        .findOne({ _id: boardID })
         .select({ _id: 0, title: 1, content: 1 , userID: 1 });
+        
+        const board_title = board.title;
+        const board_content = board.content;
+        const board_userID = board.userID;
+        const board_comment = await this.commentModel.find().where({ boardID: uid.id });
+
+        const board_info = { board_title, board_content, board_userID, board_comment }
+
         if (board) {
-            return board;
+            return board_info;
         }
         else {
             throw new NotFoundException();
@@ -72,10 +84,10 @@ export class BoardRepository {
     }
 
     // 게시판 글 수정
-    async updateBoard(user: LoginUserCheckDTO, _id: BoardFindBasicDTO, updateBoardDTO: UpdateBoardDTO) {
+    async updateBoard(user: LoginUserCheckDTO, uid: BoardFindBasicDTO, updateBoardDTO: UpdateBoardDTO) {
         const loginUser = await this.userModel.findOne({ _id: user._id }).exec(); 
         console.log("loginUser:", loginUser);
-        const board = await this.boardVerify(loginUser, _id);
+        const board = await this.boardVerify(loginUser, uid);
         console.log("board:", board);
 
         if(!board) {
@@ -89,19 +101,21 @@ export class BoardRepository {
     }
 
     // 게시판 글 삭제
-    async deleteBoard(user: LoginUserCheckDTO, _id: BoardFindBasicDTO) { 
+    async deleteBoard(user: LoginUserCheckDTO, uid: BoardFindBasicDTO) { 
         const loginUser = await this.userModel.findOne({ _id: user._id }).exec();
         console.log("loginUser:", loginUser);
-        const board = await this.boardVerify(loginUser, _id);
+        const board = await this.boardVerify(loginUser, uid);
         console.log("board:", board);
         if(!board) {
             throw new ForbiddenException();
         }
         else {
-            await this.boardModel.deleteOne({ _id });
-            while (board) {
-                await this.commentRepository.deleteComment(loginUser, _id);
-            }
+            await this.boardModel.deleteOne({ uid });
+            await this.commentModel.deleteMany({ boardID: uid });
+            // if (board.uid == this.commentModel.boardID) {
+            //     await this.commentModel.deleteOne({ uid });
+            //     return 
+            // }
             return "게시판이 삭제되었습니다.";
         }        
     }

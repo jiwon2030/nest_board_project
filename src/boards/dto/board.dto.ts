@@ -14,7 +14,7 @@ export class CreateBoardDTO {
 }
 
 export class BoardFindBasicDTO extends PickType (Board, [
-    '_id',
+    'uid',
     'title',
     'content',
     'userID',
