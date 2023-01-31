@@ -59,13 +59,11 @@ export class UsersService {
 
   // 닉네임 변경
   async nicknameChange(user: FindLoginUserDTO, body: UserNicknameChangeDTO) {
-    const userinfo_id = user._id;    
-    const user_info = await this.userModel.findOne({ _id: userinfo_id });   
+    const user_info = await this.userModel.findOne({ _id: user._id });   
     const { id } = user_info;
     console.log("user:", user);
-    const { _id, nickname } = body;
-    const body_id = body.id;
-    const body_nickname = body.nickname;
+    const { nickname } = body;
+    const changeNickname = body.nickname;
     const idCheck = await this.usersRepository.findUserId(id);
     const nickNameCheck = await this.usersRepository.findUserNickName(nickname);
     console.log("idcheck:", idCheck);
@@ -74,34 +72,32 @@ export class UsersService {
       await this.usersRepository.nicknameChange(
         user,
         {
-        id: body_id, 
-        nickname: body_nickname
+        id, 
+        nickname: changeNickname
         });
-      return user;
+      return "닉네임이 변경되었습니다.";
     }
     else { throw new NotFoundException("닉네임 변경 실패했습니다."); }
   }
 
   // 비밀번호 변경
   async passwordChange(user: FindLoginUserDTO, body: UserPwdChangeDTO) {
-    const userinfo_id = user._id;
-    const user_info = await this.userModel.findOne({ _id: userinfo_id });
+    const user_info = await this.userModel.findOne({ _id: user._id });
     const { id } = user_info;
     console.log("user:", user);
-    const body_id = body.id;
-    const body_pw = body.password;
+    const changePassword = body.password;
     const idCheck = await this.usersRepository.findUserId(id);
     console.log("idcheck:", idCheck);
-    const makePassword = PasswordMaker(body_pw);
+    const makePassword = PasswordMaker(changePassword);
     if (idCheck) {
       await this.usersRepository.passwordChange(
         user,
         {
-          id: body_id,
+          id,
           password: makePassword.password,
           salt: makePassword.salt,
         });
-      return user;
+      return "비밀번호가 변경되었습니다.";
     } 
     else { throw new NotFoundException("비밀번호 변경 실패했습니다."); }
   }
