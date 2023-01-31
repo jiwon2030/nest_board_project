@@ -58,7 +58,7 @@ export class CommentRepository {
              const uid = uuid_v1();
              const content = data.content;
              const userID = loginUser._id;
-             const boardID = board._id;
+             const boardID = board.uid;
              const comment: CreateCommentDTO = { uid, userID, boardID, content };
  
              return this.commentModel.create(comment);    
