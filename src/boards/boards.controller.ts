@@ -27,9 +27,9 @@ export class BoardsController {
 
   @ApiOperation({ summary: '게시판 글 상세 페이지'})
   @ApiTags('board')
-  @Get(':id')
-  async getBoardById(@Param() _id: BoardFindBasicDTO) {
-    return await this.boardsService.getBoardById(_id); 
+  @Get(':uid')
+  async getBoardById(@Param('uid') uid) {
+    return await this.boardsService.getBoardById(uid); 
   }
 
   @UseGuards(JwtAuthGuard)
@@ -38,10 +38,10 @@ export class BoardsController {
   @Patch(':uid')
   async updateBoard(
     @CurrentUser() user: LoginUserCheckDTO,
-    @Param('id') _id: BoardFindBasicDTO,    
+    @Param('uid') uid: BoardFindBasicDTO,    
     @Body() updateBoardDTO: UpdateBoardDTO
   ) {
-    return await this.boardsService.updateBoard(user, _id, updateBoardDTO);
+    return await this.boardsService.updateBoard(user, uid, updateBoardDTO);
   }
   
   @UseGuards(JwtAuthGuard)
@@ -50,8 +50,8 @@ export class BoardsController {
   @Delete(':uid')
   async deleteBoard(
     @CurrentUser() user: LoginUserCheckDTO,
-    @Param('id') _id: BoardFindBasicDTO
+    @Param('uid') uid: BoardFindBasicDTO
     ) {
-    return await this.boardsService.deleteBoard(user, _id);
+    return await this.boardsService.deleteBoard(user, uid);
   }
 }

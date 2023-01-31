@@ -63,15 +63,16 @@ export class BoardRepository {
     // 게시판 글 상세 페이지
     async getBoardById(uid) {
         console.log(uid);
-        const boardID = uid.id;
+        const boardID = uid;
         const board = await this.boardModel
-        .findOne({ _id: boardID })
+        .findOne({ uid: boardID })
         .select({ _id: 0, title: 1, content: 1 , userID: 1 });
+        console.log(board);
         
         const board_title = board.title;
         const board_content = board.content;
         const board_userID = board.userID;
-        const board_comment = await this.commentModel.find().where({ boardID: uid.id });
+        const board_comment = await this.commentModel.find().where({ boardID: uid });
 
         const board_info = { board_title, board_content, board_userID, board_comment }
 

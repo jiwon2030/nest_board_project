@@ -15,16 +15,16 @@ export class BoardsService {
     return await this.boardRepository.createBoard(loginUser, data);
   }
 
-  async getBoardById(_id: BoardFindBasicDTO) {
-    return await this.boardRepository.getBoardById(_id);
+  async getBoardById(uid: BoardFindBasicDTO) {
+    return await this.boardRepository.getBoardById(uid);
   }
 
-  async updateBoard(user: LoginUserCheckDTO, _id: BoardFindBasicDTO, updateBoardDTO: UpdateBoardDTO) {
-    return await this.boardRepository.updateBoard(user, _id, updateBoardDTO)
+  async updateBoard(user: LoginUserCheckDTO, uid: BoardFindBasicDTO, updateBoardDTO: UpdateBoardDTO) {
+    return await this.boardRepository.updateBoard(user, uid, updateBoardDTO)
   }
 
-  async deleteBoard(loginUser: LoginUserCheckDTO, _id: BoardFindBasicDTO) {
-    return await this.boardRepository.deleteBoard(loginUser, _id)
+  async deleteBoard(loginUser: LoginUserCheckDTO, uid: BoardFindBasicDTO) {
+    return await this.boardRepository.deleteBoard(loginUser, uid)
   }
 }
 
