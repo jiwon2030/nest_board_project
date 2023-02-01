@@ -6,10 +6,6 @@ import { BoardIDFindDTO, CommentFindBasicDTO, CreateCommentDTO, LoginUserCheckDT
 export class CommentsService {
   constructor(private readonly commentRepository: CommentRepository) { }
 
-  async getAllComments() {
-    return await this.commentRepository.getAllComments();
-  }
-
   async createComment(loginUser: LoginUserCheckDTO, boardId: BoardIDFindDTO, data: CreateCommentDTO) {
     return await this.commentRepository.createComment(loginUser, boardId, data);
   }

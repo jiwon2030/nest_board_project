@@ -15,11 +15,6 @@ export class CommentRepository {
         @InjectModel(Board.name) private readonly boardModel?: Model<Board>,
         @InjectModel(Comment.name) private readonly commentModel?: Model<Comment>,
     ) { }
-
-    // 댓글 전체 리스트 페이지
-    async getAllComments() { 
-       return this.commentModel.find({ });
-    }
   
      // 사용자가 작성한 댓글 확인
      async commentVerify(loginUser: LoginUserCheckDTO, uid: CommentFindBasicDTO) {
