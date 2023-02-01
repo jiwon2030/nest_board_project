@@ -25,7 +25,6 @@ export class FindLoginUserDTO extends PickType(User, [
     id: string;
 }
 
-
 export class UserNicknameChangeDTO extends PickType(User, ['_id'] as const) {
     @ApiProperty({
         example: 'testnickname',
@@ -41,9 +40,4 @@ export class UserPwdChangeDTO extends PickType(User, ['_id'] as const) {
     id: string;
     password: string;
     salt: string;
-}
-
-export class Testuserpwddto{
-    id: string;
-    password: string;
 }
