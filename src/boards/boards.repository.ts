@@ -6,8 +6,6 @@ import { Board } from 'src/model/boards.model';
 import { v1 as uuid_v1 } from 'uuid';
 import { UpdateBoardDTO, CreateBoardDTO, LoginUserCheckDTO, BoardFindBasicDTO } from './dto/board.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
-import { CommentRepository } from 'src/comments/comments.repository';
-import { CommentFindBasicDTO } from 'src/comments/dto/comment.dto';
 import { Comment } from 'src/model/comments.model';
 
 @Injectable()
@@ -62,19 +60,20 @@ export class BoardRepository {
 
     // 게시판 글 상세 페이지
     async getBoardById(uid) {
-        console.log(uid);
         const boardID = uid;
         const board = await this.boardModel
         .findOne({ uid: boardID })
         .select({ _id: 0, title: 1, content: 1 , userID: 1 });
-        console.log(board);
-        
-        const board_title = board.title;
-        const board_content = board.content;
-        const board_userID = board.userID;
+        const userNickname = await this.userModel
+        .findOne({ _id: board.userID })
+        .select({ _id: 0, nickname: 1 });
         const board_comment = await this.commentModel.find().where({ boardID: uid });
 
-        const board_info = { board_title, board_content, board_userID, board_comment }
+        const board_title = board.title;
+        const board_content = board.content;
+        const board_userNickname = userNickname.nickname;
+
+        const board_info = { board_title, board_content, board_userNickname, board_comment }
 
         if (board) {
             return board_info;
@@ -87,9 +86,7 @@ export class BoardRepository {
     // 게시판 글 수정
     async updateBoard(user: LoginUserCheckDTO, uid: BoardFindBasicDTO, updateBoardDTO: UpdateBoardDTO) {
         const loginUser = await this.userModel.findOne({ _id: user._id }).exec(); 
-        console.log("loginUser:", loginUser);
         const board = await this.boardVerify(loginUser, uid);
-        console.log("board:", board);
 
         if(!board) {
             throw new ForbiddenException();
@@ -104,20 +101,15 @@ export class BoardRepository {
     // 게시판 글 삭제
     async deleteBoard(user: LoginUserCheckDTO, uid: BoardFindBasicDTO) { 
         const loginUser = await this.userModel.findOne({ _id: user._id }).exec();
-        console.log("loginUser:", loginUser);
         const board = await this.boardVerify(loginUser, uid);
-        console.log("board:", board);
         if(!board) {
             throw new ForbiddenException();
         }
         else {
             await this.boardModel.deleteOne({ uid });
             await this.commentModel.deleteMany({ boardID: uid });
-            // if (board.uid == this.commentModel.boardID) {
-            //     await this.commentModel.deleteOne({ uid });
-            //     return 
-            // }
             return "게시판이 삭제되었습니다.";
         }        
     }
 }
+
