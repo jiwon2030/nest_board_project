@@ -62,14 +62,6 @@ export class User extends Document {
     })
     salt: string;
 
-    @IsNotEmpty()
-    @IsDate()
-    @Prop({
-        required:true,
-        default: new Date(),
-        type: mongoose.Schema.Types.Date,
-    })
-    createdAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
