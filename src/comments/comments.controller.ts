@@ -9,13 +9,6 @@ import { CurrentUser } from 'src/common/decorators/user.decorator';
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) { }
 
-  @ApiOperation({ summary: '댓글 전체 페이지 조회'})
-  @ApiTags('comment')
-  @Get('/')
-  async getAllComment() {
-    return await this.commentsService.getAllComments();
-  }
-
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '댓글 등록'})
   @ApiTags('comment')
